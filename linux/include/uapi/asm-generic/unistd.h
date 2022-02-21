@@ -860,8 +860,11 @@ __SYSCALL(__NR_faccessat2, sys_faccessat2)
 #define __NR_process_madvise 440
 __SYSCALL(__NR_process_madvise, sys_process_madvise)
 
+#define __NR_inspect_table 500
+__SYSCALL(__NR_inspect_table, sys_inspect_table)
+
 #undef __NR_syscalls
-#define __NR_syscalls 441
+#define __NR_syscalls 501
 
 /*
  * 32 bit systems traditionally used different

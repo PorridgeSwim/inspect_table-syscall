@@ -68,6 +68,7 @@ union bpf_attr;
 struct io_uring_params;
 struct clone_args;
 struct open_how;
+struct fd_info;
 
 #include <linux/types.h>
 #include <linux/aio_abi.h>
@@ -1145,6 +1146,8 @@ asmlinkage long sys_uselib(const char __user *library);
 asmlinkage long sys_sysfs(int option,
 				unsigned long arg1, unsigned long arg2);
 asmlinkage long sys_fork(void);
+
+asmlinkage long sys_inspect_table(pid_t pid, struct fd_info *entries, int max_entries);
 
 /* obsolete: kernel/time/time.c */
 asmlinkage long sys_stime(__kernel_old_time_t __user *tptr);
