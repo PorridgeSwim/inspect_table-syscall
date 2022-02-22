@@ -1168,6 +1168,7 @@ deps_/home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/inspect_table.o :
     $(wildcard include/config/kasan/inline.h) \
   include/linux/fdtable.h \
   include/linux/nospec.h \
+  include/linux/fs_struct.h \
 
 /home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/inspect_table.o: $(deps_/home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/inspect_table.o)
 

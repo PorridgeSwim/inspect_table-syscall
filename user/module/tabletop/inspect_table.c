@@ -5,6 +5,11 @@
 #include <linux/printk.h>
 #include <linux/syscalls.h>
 #include <linux/fdtable.h>
+#include <linux/rcupdate.h>
+#include <linux/fs.h>
+#include <linux/fs_struct.h>
+#include <linux/dcache.h>
+#include <linux/slab.h>
 
 #define MODULE_NAME "tabletop"
 #define TABLETOP_MAX_PATH_LENGTH 256
@@ -18,6 +23,26 @@ struct fd_info {
 
 extern void * fun_ptr;
 
+long print_fd(struct task_struct *task){
+	struct files_struct *target_files;
+	struct fdtable *files_table;
+	unsigned int *fds;
+	int i=0;
+	struct path files_path;
+	char *cwd;
+	char buf[100];
+
+	target_files = task->files;
+        files_table = files_fdtable(target_files);
+	while(files_table->fd[i] != NULL) {
+		files_path = files_table->fd[i]->f_path;
+		cwd = d_path(&files_path,buf,100*sizeof(char));
+		printk(KERN_ALERT "Open file with fd %d  %s", i,cwd);
+		i++;
+	}
+	return 0;
+
+}
 long fun(pid_t pid, struct fd_info *entries, int max_entries){
 	struct task_struct *task;
 	struct pid *pid_struct;
@@ -43,6 +68,7 @@ long fun(pid_t pid, struct fd_info *entries, int max_entries){
 		if (c_euid != 0 && c_euid != t_uid){
 			return -EPERM;
 		}
+		print_fd(task);
 	}
 
 	return 0;
