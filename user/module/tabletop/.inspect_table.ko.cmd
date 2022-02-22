@@ -1,0 +1,1 @@
+cmd_/home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/inspect_table.ko := ld -r -m elf_x86_64 --build-id=sha1  -T scripts/module.lds -o /home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/inspect_table.ko /home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/inspect_table.o /home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/inspect_table.mod.o;  true

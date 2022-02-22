@@ -22,34 +22,21 @@ struct fd_info {
     char path[TABLETOP_MAX_PATH_LENGTH];
 };
 
+long (*fun_ptr)(pid_t pid, struct fd_info *entries, int max_entries) = NULL;
+EXPORT_SYMBOL(fun_ptr);
+
+//extern long fun(pid_t pid, struct fd_info *entries, int max_entries);
+//extern long (*fun_ptr)(pid_t pid, struct fd_info *entries, int max_entries);
+//extern void* fun_ptr;
+
 SYSCALL_DEFINE3(inspect_table, pid_t, pid, struct fd_info *, entries, int, max_entries)
 {
-	struct task_struct *task;
-	struct pid *pid_struct;
-	uid_t t_uid;
-	uid_t c_euid;
-
-	if (pid < -1){
-		return -EINVAL;
-	} else if (pid == -1){
-	//	pid_struct = find_get_pid(task_pid_nr(current));
-	//	task = get_pid_task(pid_struct, PIDTYPE_PID);
-		task = current;
-	} else{
-		if(!(pid_struct = find_get_pid(pid))){
-				return -ESRCH;
-		}
-	//	if (!pid_has_task(pid_struct, PIDTYPE_PID)){
-	//		return -ESRCH;
-	//	}
-		task = get_pid_task(pid_struct, PIDTYPE_PID);
-	       	t_uid = task->cred->uid.val;		// uid of target process
-		c_euid = current->cred->euid.val;	// euid of calling process
-		if (c_euid != 0 && c_euid != t_uid){
-			return -EPERM;
-		}
+	//int ret = fun(pid, entries, max_entries);
+	//int ret = (*fun_ptr)(pid, entries, max_entries);
+	//return ret;
+	if(!fun_ptr){
+		return -ENOSYS;
+	}else{
+		return (*fun_ptr)(pid, entries, max_entries);
 	}
-
-	return 0;
-
 }

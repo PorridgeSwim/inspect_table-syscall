@@ -1,0 +1,1 @@
+cmd_/home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/Module.symvers := sed 's/ko$$/o/' /home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/modules.order | scripts/mod/modpost -m    -o /home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/Module.symvers -e -i Module.symvers   -T -

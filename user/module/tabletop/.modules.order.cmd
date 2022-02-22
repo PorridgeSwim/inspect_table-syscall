@@ -1,0 +1,1 @@
+cmd_/home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/modules.order := {   echo /home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/inspect_table.ko; :; } | awk '!x[$$0]++' - > /home/debbie/mnt/s3/hw4-PorridgeSwim/user/module/tabletop/modules.order
