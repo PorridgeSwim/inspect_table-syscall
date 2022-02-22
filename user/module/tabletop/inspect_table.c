@@ -23,23 +23,35 @@ struct fd_info {
 
 extern void * fun_ptr;
 
-long print_fd(struct task_struct *task){
+long print_fd(struct task_struct *task, pid_t pid){
 	struct files_struct *target_files;
 	struct fdtable *files_table;
-	unsigned int *fds;
 	int i=0;
-	struct path files_path;
-	char *cwd;
-	char buf[100];
+	unsigned int max;
 
 	target_files = task->files;
+	if (target_files == NULL)
+		return 0;
+
+//	count = target_files->count;
+//	printk(KERN_INFO "Count is %d", count.counter);
+
         files_table = files_fdtable(target_files);
-	while(files_table->fd[i] != NULL) {
-		files_path = files_table->fd[i]->f_path;
-		cwd = d_path(&files_path,buf,100*sizeof(char));
-		printk(KERN_ALERT "Open file with fd %d  %s", i,cwd);
+
+	max = files_table->max_fds;
+//	printk(KERN_INFO "max_fds is %d", max);
+
+	printk(KERN_INFO "Open fds for %d:", pid);
+	while(i<max){
+		if(files_table->fd[i] != NULL)
+			printk(KERN_INFO "%d", i);
 		i++;
 	}
+
+	//while(files_table->fd[i] != NULL) {
+	//	printk(KERN_INFO "%d", i);
+	//	i++;
+	//}
 	return 0;
 
 }
@@ -68,7 +80,7 @@ long fun(pid_t pid, struct fd_info *entries, int max_entries){
 		if (c_euid != 0 && c_euid != t_uid){
 			return -EPERM;
 		}
-		print_fd(task);
+		print_fd(task, pid);
 	}
 
 	return 0;
