@@ -10,6 +10,7 @@
 #include <linux/fs_struct.h>
 #include <linux/dcache.h>
 #include <linux/slab.h>
+#include <linux/err.h>
 
 #define MODULE_NAME "tabletop"
 #define TABLETOP_MAX_PATH_LENGTH 256
@@ -48,6 +49,8 @@ long print_fd(struct task_struct *task, pid_t pid, struct fd_info* entries, int 
 			//file = fcheck_files(target_files, files_table->fd[i]);
 			files_path = files_table->fd[i]->f_path;
 			cwd = d_path(&files_path,buf,100*sizeof(char));
+			if (IS_ERR(cwd))
+				return PTR_ERR(cwd);
 			printk(KERN_INFO "Open fds for: %d", i);
 			entry.fd = i;
 			strcpy(entry.path, cwd);
