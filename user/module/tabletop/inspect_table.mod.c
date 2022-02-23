@@ -30,7 +30,13 @@ __used __section("__versions") = {
 	{ 0xf0fecfe5, "current_task" },
 	{ 0xdceac98d, "get_pid_task" },
 	{ 0x95b180c8, "find_get_pid" },
+	{ 0x6b10bee1, "_copy_to_user" },
+	{ 0x69acdf38, "memcpy" },
+	{ 0xcbd4898c, "fortify_panic" },
+	{ 0x754d539c, "strlen" },
+	{ 0xf8d3fb67, "d_path" },
 	{ 0xc5850110, "printk" },
+	{ 0xc959d152, "__stack_chk_fail" },
 	{ 0xbdfb6dbb, "__fentry__" },
 };
 

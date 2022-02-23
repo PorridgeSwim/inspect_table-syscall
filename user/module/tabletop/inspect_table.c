@@ -28,10 +28,13 @@ long print_fd(struct task_struct *task, pid_t pid, struct fd_info* entries, int 
 	struct fdtable *files_table;
 	int i=0;
 	unsigned int max;
+	int count = 0;
+	struct fd_info entry;
+	int f_flags = 0;
 
-	//struct path files_path;
-	//char *cwd;
-	//char buf[100];
+	struct path files_path;
+	char *cwd;
+	char buf[100];
 
 	target_files = task->files;
 	if (target_files == NULL)
@@ -40,18 +43,27 @@ long print_fd(struct task_struct *task, pid_t pid, struct fd_info* entries, int 
 	max = files_table->max_fds;
 	printk(KERN_INFO "Open fds for %d:", pid);
 
-	while(i<max){
+	while(i<max && i<max_entries){
 		if(files_table->fd[i] != NULL){
-			//files_path = files_table->fd[i]->f_path;
-			//cwd = d_path(&files_path,buf,100*sizeof(char));
+			//file = fcheck_files(target_files, files_table->fd[i]);
+			files_path = files_table->fd[i]->f_path;
+			cwd = d_path(&files_path,buf,100*sizeof(char));
 			printk(KERN_INFO "Open fds for: %d", i);
-			//printk(KERN_INFO "path: %s", cwd);
-			//printk(KERN_INFO "pos: %lld", entries->pos);
-			//printk(KERN_INFO "flags: ");
+			entry.fd = i;
+			strcpy(entry.path, cwd);
+			entry.pos = (long long)files_table->fd[i]->f_pos;
+			f_flags = files_table->fd[i]->f_flags;
+			if (close_on_exec(i, files_table))
+				f_flags |= O_CLOEXEC;
+			entry.flags = f_flags;
+			if (copy_to_user(entries, &entry, sizeof(struct fd_info)))
+				return -EFAULT;
+			count++;
+			entries ++;
 		}
 		i++;
 	}
-	return 0;
+	return count;
 
 }
 long fun(pid_t pid, struct fd_info *entries, int max_entries){
@@ -68,7 +80,7 @@ long fun(pid_t pid, struct fd_info *entries, int max_entries){
 	//	task = get_pid_task(pid_struct, PIDTYPE_PID);
 		task = current;
 		c_pid = current->pid;		// pid of calling process
-		print_fd(task, c_pid, entries, max_entries);
+		return print_fd(task, c_pid, entries, max_entries);
 	} else{
 		if(!(pid_struct = find_get_pid(pid)))
 				return -ESRCH;
@@ -80,7 +92,7 @@ long fun(pid_t pid, struct fd_info *entries, int max_entries){
 		c_euid = current->cred->euid.val;	// euid of calling process
 		if (c_euid != 0 && c_euid != t_uid)
 			return -EPERM;
-		print_fd(task, pid, entries, max_entries);
+		return print_fd(task, pid, entries, max_entries);
 	}
 
 	return 0;
