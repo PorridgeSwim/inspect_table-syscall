@@ -42,7 +42,7 @@ long print_fd(struct task_struct *task, pid_t pid, struct fd_info* entries, int 
 		return 0;
         files_table = files_fdtable(target_files);
 	max = files_table->max_fds;
-	printk(KERN_INFO "Open fds for %d:", pid);
+	printk(KERN_INFO "Open fds for %d:\n", pid);
 
 	while(i<max && i<max_entries){
 		if(files_table->fd[i] != NULL){
@@ -51,7 +51,7 @@ long print_fd(struct task_struct *task, pid_t pid, struct fd_info* entries, int 
 			cwd = d_path(&files_path,buf,100*sizeof(char));
 			if (IS_ERR(cwd))
 				return PTR_ERR(cwd);
-			printk(KERN_INFO "Open fds for: %d", i);
+			printk(KERN_INFO "Open fds for: %d\n", i);
 			entry.fd = i;
 			strcpy(entry.path, cwd);
 			entry.pos = (long long)files_table->fd[i]->f_pos;
