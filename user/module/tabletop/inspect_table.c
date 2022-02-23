@@ -23,35 +23,34 @@ struct fd_info {
 
 extern void * fun_ptr;
 
-long print_fd(struct task_struct *task, pid_t pid){
+long print_fd(struct task_struct *task, pid_t pid, struct fd_info* entries, int max_entries){
 	struct files_struct *target_files;
 	struct fdtable *files_table;
 	int i=0;
 	unsigned int max;
 
+	//struct path files_path;
+	//char *cwd;
+	//char buf[100];
+
 	target_files = task->files;
 	if (target_files == NULL)
 		return 0;
-
-//	count = target_files->count;
-//	printk(KERN_INFO "Count is %d", count.counter);
-
         files_table = files_fdtable(target_files);
-
 	max = files_table->max_fds;
-//	printk(KERN_INFO "max_fds is %d", max);
-
 	printk(KERN_INFO "Open fds for %d:", pid);
+
 	while(i<max){
-		if(files_table->fd[i] != NULL)
-			printk(KERN_INFO "%d", i);
+		if(files_table->fd[i] != NULL){
+			//files_path = files_table->fd[i]->f_path;
+			//cwd = d_path(&files_path,buf,100*sizeof(char));
+			printk(KERN_INFO "Open fds for: %d", i);
+			//printk(KERN_INFO "path: %s", cwd);
+			//printk(KERN_INFO "pos: %lld", entries->pos);
+			//printk(KERN_INFO "flags: ");
+		}
 		i++;
 	}
-
-	//while(files_table->fd[i] != NULL) {
-	//	printk(KERN_INFO "%d", i);
-	//	i++;
-	//}
 	return 0;
 
 }
@@ -60,6 +59,7 @@ long fun(pid_t pid, struct fd_info *entries, int max_entries){
 	struct pid *pid_struct;
 	uid_t t_uid;
 	uid_t c_euid;
+	uid_t c_pid;
 
 	if (pid < -1){
 		return -EINVAL;
@@ -67,20 +67,20 @@ long fun(pid_t pid, struct fd_info *entries, int max_entries){
 	//	pid_struct = find_get_pid(task_pid_nr(current));
 	//	task = get_pid_task(pid_struct, PIDTYPE_PID);
 		task = current;
+		c_pid = current->pid;		// pid of calling process
+		print_fd(task, c_pid, entries, max_entries);
 	} else{
-		if(!(pid_struct = find_get_pid(pid))){
+		if(!(pid_struct = find_get_pid(pid)))
 				return -ESRCH;
-		}
 	//	if (!pid_has_task(pid_struct, PIDTYPE_PID)){
 	//		return -ESRCH;
 	//	}
 		task = get_pid_task(pid_struct, PIDTYPE_PID);
 	       	t_uid = task->cred->uid.val;		// uid of target process
 		c_euid = current->cred->euid.val;	// euid of calling process
-		if (c_euid != 0 && c_euid != t_uid){
+		if (c_euid != 0 && c_euid != t_uid)
 			return -EPERM;
-		}
-		print_fd(task, pid);
+		print_fd(task, pid, entries, max_entries);
 	}
 
 	return 0;
